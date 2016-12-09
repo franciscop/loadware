@@ -1,0 +1,25 @@
+{
+  "name": "loadware",
+  "version": "0.1.0",
+  "description": "A library to make sense of a bunch of middleware definitions and return a simple array of middleware\"",
+  "main": "loadware.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/franciscop/loadware.git"
+  },
+  "keywords": [
+    "loadware",
+    "middleware",
+    "load",
+    "normalize"
+  ],
+  "author": "Francisco Presencia <public@francisco.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/franciscop/loadware/issues"
+  },
+  "homepage": "https://github.com/franciscop/loadware#readme"
+}
