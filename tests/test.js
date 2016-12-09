@@ -1,7 +1,7 @@
 let pray = require('pray');
 let loadware = require('../loadware');
 
-pray.isFn = (el) => expect(el instanceof Function).toBe(true);
+pray.isFn = (el) => expect(el instanceof Function).to.equal(true, el + 'is not a function');
 let allFn = arr => arr.forEach(pray.isFn);
 
 describe('loadware.js', function() {
@@ -27,7 +27,7 @@ describe('loadware.js', function() {
     let fn = function(){};
     let loaded = loadware({ a: './tests/a', b: './tests/b' }, { c: './tests/c' }, fn, { b: false });
     pray(allFn)(loaded);
-    expect(loaded).toHaveLength(3);
+    expect(loaded.length).to.equal(3);
   });
 
   // When passing Router() it only rendered the last one since it had some properties
@@ -36,7 +36,7 @@ describe('loadware.js', function() {
     let fnB = function(){};
     fnA.a = 'a';
     fnB.a = 'b';
-    expect(loadware([fnA, fnB])).toHaveLength(2);
+    expect(loadware([fnA, fnB]).length).to.equal(2);
   });
 
   it('Default stays the same', () => {
