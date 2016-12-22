@@ -1,6 +1,6 @@
 {
   "name": "loadware",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A library to make sense of a bunch of middleware definitions and return a simple array of middleware\"",
   "main": "loadware.js",
   "scripts": {
@@ -25,5 +25,8 @@
   "devDependencies": {
     "jest": "^17.0.3",
     "pray": "^1.0.2"
+  },
+  "dependencies": {
+    "app-module-path": "^2.1.0"
   }
 }

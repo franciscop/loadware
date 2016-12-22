@@ -5,6 +5,8 @@
     [() => {}, () => {}, () => {}, () => {}]
 */
 
+require('app-module-path').addPath(process.cwd());
+
 let isObject = obj => obj.toString() === '[object Object]';
 
 // Retrieve the first key of an object
