@@ -5,6 +5,7 @@
     [() => {}, () => {}, () => {}, () => {}]
 */
 
+
 require('app-module-path').addPath(process.cwd());
 
 let isObject = obj => obj.toString() === '[object Object]';
@@ -93,7 +94,14 @@ module.exports = (...middle) => {
 
   // Include from string
   // ['a', 'b'] => [require('a'), require('b')]
-  middle = middle.map(mid => typeof mid === 'string' ? require(mid) : mid);
+  middle = middle.map(mid => {
+    if (typeof mid === 'string') {
+      // Fetches the absolute path from the root
+      // Note: this doesn't work: 'require(mid)'
+      return require(require('path').resolve(mid));
+    }
+    return mid;
+  });
 
   return middle;
 };
