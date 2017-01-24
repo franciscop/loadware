@@ -16,4 +16,6 @@ let middlewares = loadware(
 );
 ```
 
+The middleware can be a string, a function or an array of any of the previous.
+
 This is part of another project which is WIP right now, but I think this is independently enough so it can be launched separately.

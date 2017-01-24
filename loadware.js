@@ -1,107 +1,26 @@
-/*
-  loadware.js - middleware handling
-  Normalizes a varied group of middleware descriptors into an array of middleware.
-  loadware(['body-parser', [() => {}], ['cookie-parser', { session: () => {} }]]) =>
-    [() => {}, () => {}, () => {}, () => {}]
-*/
-
-
+// loadware.js - Turn different middleware descriptors into an array of middleware
 require('app-module-path').addPath(process.cwd());
-
-let isObject = obj => obj.toString() === '[object Object]';
-
-// Retrieve the first key of an object
-let getKey = obj => isObject(obj) ? Object.keys(obj)[0] : false;
-
-// Retrieve the first value of an object
-let getValue = obj => obj[getKey(obj)];
 
 // Put it all into a single array of non-arrays recursively
 // ['a', ['b', ['c', ...]]] => ['a', 'b', 'c', ...]
-let flat = middle => {
-  while (middle.filter(mid => mid instanceof Array).length) {
-    middle = middle.reduce((all, arg) => all.concat(arg), []);
-  }
-  return middle;
+let flat = arr => arr.reduce((good, one) => {
+  let flatten = Array.isArray(one) ? flat(one) : one || [];
+  return good.concat(flatten)
+}, []);
+
+// Fetches the absolute path from the root
+// ['a', 'b'] => [require('a'), require('b')]
+// Note: this doesn't work: 'require(mid)'
+let include = mid => typeof mid === 'string'
+  ? require(require('path').resolve(mid))
+  : mid;
+
+// Throw an error if there's something that is not a function anymore
+// [{ a: 'b' }] => throw new Error();
+let others = mid => {
+  if (mid instanceof Function) return mid;
+  throw new Error("Only boolean, string, array or function can be middleware");
 }
 
-
-// Expand a complex object into several simple ones
-// [{ a: 'a', b: 'b', c: 'c' }] => [{ a: 'a' }, { b: 'b' }, { c: 'c' }]
-let expand = middle => {
-  middle = middle.map(mid => {
-    if (!isObject(mid)) return mid;
-
-    let arr = [];
-    for (let key in mid) {
-      arr.push({ [key]: mid[key] });
-    }
-    return arr;
-  });
-  return flat(middle);
-};
-
-
-
-
-
-// Get them all together in a single object
-let join = (obj, one) => Object.assign({}, obj, one);
-
-// Retrieve an object with the last known config
-let retrieveObjs = middle => middle.filter(isObject).reduce(join, {});
-
-
-
-
-
-// Keep only the last copy for a named middleware
-let removeDups = (middle, objs) => middle.map(getKey)
-
-  // Flag which objects to remove
-  .map((key, i, all) => !key || all.lastIndexOf(key) === i)
-
-  // Map the good copies to the original value
-  .map((good, i) => good && middle[i])
-
-  // Defined && not an object || defined && a non-empty object
-  .filter(mid => mid && (!getKey(mid) || getValue(mid)));
-
-
-
-
-
-module.exports = (...middle) => {
-
-  // Make it into a non-null list of functions
-  middle = flat(middle);
-
-  // Put object with several keys into different objects
-  // [{ a: 'a', b: 'b' }, { c: 'c' }] => [{ a: 'a' }, { b: 'b' }, { c: 'c' }]
-  middle = expand(middle);
-
-  // Get an object with each of the named middlewares
-  // [{ a: 'a' }, { b: 'b' }, { a: 'c' }] => [{ a: 'c', b: 'b' }]
-  let objs = retrieveObjs(middle);
-
-  // Remove duplicated, previous objects
-  // [{ a: 'a' }, { b: 'b' }, { a: 'c' }] => [{ b: 'b' }, { a: 'c' }]
-  middle = removeDups(middle, objs);
-
-  // Finally keep only the callback
-  // [{ b: 'b' }, { a: 'c' }] => ['b', 'c']
-  middle = middle.map(mid => isObject(mid) ? getValue(mid) : mid);
-
-  // Include from string
-  // ['a', 'b'] => [require('a'), require('b')]
-  middle = middle.map(mid => {
-    if (typeof mid === 'string') {
-      // Fetches the absolute path from the root
-      // Note: this doesn't work: 'require(mid)'
-      return require(require('path').resolve(mid));
-    }
-    return mid;
-  });
-
-  return middle;
-};
+// The actual glue for them all
+module.exports = (...middle) => flat(middle).map(include).filter(others);
