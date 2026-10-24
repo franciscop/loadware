@@ -1,4 +1,4 @@
-# loadware [![npm install loadware](https://img.shields.io/badge/npm%20install-loadware-blue.svg)](https://www.npmjs.com/package/loadware) [![tests](https://github.com/franciscop/loadware/workflows/tests/badge.svg)](https://github.com/franciscop/loadware/actions)
+# loadware
 
 Make sense of a bunch of middleware definitions and return an array of middleware:
 
